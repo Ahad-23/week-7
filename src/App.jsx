@@ -1,20 +1,23 @@
-import { useContext, useMemo, useState } from "react"
+import { useContext, useState } from "react"
 import { CountContext } from "./context";
-import { RecoilRoot, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { countAtom, evenSelector } from "./store/atoms/count";
+
 
 function App() {
+  const [count, setCount] = useState(0);
+  
+  // wrap anyone that wants to use the teleported value inside a provider
   return (
     <div>
-      <RecoilRoot>
+      <CountContext.Provider value={{
+        count, setCount
+      }}>
         <Count />
-      </RecoilRoot>
+      </CountContext.Provider>
     </div>
   )
 }
 
 function Count() {
-  console.log("re-render");
   return <div>
     <CountRenderer />
     <Buttons />
@@ -22,35 +25,22 @@ function Count() {
 }
 
 function CountRenderer() {
-  const count = useRecoilValue(countAtom);
-  
-  return <div>
-    <b>
-      {count}
-    </b>
-    <EvenCountRenderer />
-  </div>
-}
-
-function EvenCountRenderer() {
-  const isEven = useRecoilValue(evenSelector);
+  const {count, setCount} = useContext(CountContext);
 
   return <div>
-    {isEven ? "It is even" : null}
+    {count}
   </div>
 }
 
 function Buttons() {
-  const setCount = useSetRecoilState(countAtom);
-  console.log("buttons re-rendererd");
-
+  const {count, setCount} = useContext(CountContext);
   return <div>
     <button onClick={() => {
-      setCount(count => count + 1)
+      setCount(count + 1)
     }}>Increase</button>
 
     <button onClick={() => {
-      setCount(count => count - 1)
+      setCount(count - 1)
     }}>Decrease</button>
   </div>
 }
